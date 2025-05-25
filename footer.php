@@ -1,51 +1,54 @@
-<div class="footer-top-area">
-    <div class="zigzag-bottom"></div>
+<div class="footer">
     <div class="container">
         <div class="row">
             <div class="col-md-4 col-sm-6">
-                <div class="footer-about-us">
-                    <h2>BHT<span> Bookstore</span></h2>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Perferendis sunt id doloribus vero quam laborum quas alias dolores blanditiis iusto consequatur, modi aliquid
-                        eveniet eligendi iure eaque ipsam iste, pariatur omnis sint! Suscipit, debitis, quisquam. Laborum commodi veritatis magni at?</p>
+                <div class="footer-about">
+                    <h3>REBOOK</h3>
+                    <p>Nhà sách trực tuyến hàng đầu Việt Nam, cung cấp hàng triệu đầu sách với giá tốt nhất.</p>
                     <div class="footer-social">
-                        <a href="#" target="_blank"><i class="fab fa-facebook"></i></a>
-                        <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
-                        <a href="#" target="_blank"><i class="fab fa-youtube"></i></a>
-                        <a href="#" target="_blank"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-4 col-sm-6">
-                <div class="footer-menu">
-                    <h2 class="footer-wid-title">Danh mục</h2>
+                <div class="footer-links">
+                    <h3>Chính sách</h3>
                     <ul>
-                        <?php
-                            $sql = 'SELECT * FROM Categories ORDER BY CategoryID DESC';
-                            $categories = Database::GetData($sql);
-                            foreach ($categories as $cate) {
-                                echo '<li><a href="' . ROOT_URL . '/category-book.php?CategoryID=' . $cate['CategoryID'] . '">' . $cate['CategoryName'] . '</a></li>';
-                            }
-                        ?>
+                        <li><a href="#">Chính sách đổi trả</a></li>
+                        <li><a href="#">Chính sách bảo mật</a></li>
+                        <li><a href="#">Chính sách vận chuyển</a></li>
+                        <li><a href="#">Điều khoản sử dụng</a></li>
+                        <li><a href="#">Chính sách khách sỉ</a></li>
                     </ul>
                 </div>
             </div>
 
-            <div class="col-md-4 col-sm-12">
-                <div class="footer-newsletter">
-                    <h2 class="footer-wid-title">Liên hệ</h2>
-                    <p>Đăng ký nhận bản tin của chúng tôi và nhận các ưu đãi độc quyền mà bạn sẽ không tìm thấy ở bất kỳ nơi nào khác ngay trong hộp thư đến của bạn!</p>
-                    <div class="newsletter-form">
-                        <form action="#">
-                            <input type="email" placeholder="yourmail@gmail.com">
-                            <input type="submit" value="Đăng ký">
-                        </form>
+            <div class="col-md-4 col-sm-6">
+                    <div class="footer-contact">
+                        <p><i class="fas fa-phone"></i> 1900 636 467</p>
+                        <p><i class="fas fa-envelope"></i> supportrebook@gmail.com</p>
+                        <p><i class="fas fa-map-marker-alt"></i> UIT, Thủ Đức, TP. HCM</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div> <!-- End footer top area -->
+</div>
+
+<div class="footer-bottom">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <p>&copy; 2025 REBOOK. All rights reserved.</p>
+                <p>Giấy chứng nhận Đăng ký Kinh doanh số 03870027JQK do Sở Kế hoạch và Đầu tư Thành phố Hồ Chí Minh cấp ngày 20/12/2005</p>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Latest jQuery form server -->
 <script src="https://code.jquery.com/jquery.min.js"></script>

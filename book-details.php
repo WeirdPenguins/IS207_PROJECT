@@ -9,25 +9,153 @@
 <div class="single-product-area">
     <div class="zigzag-bottom"></div>
     <div class="container">
-        <div style="display: flex;">
-            <div style="width: 300px; padding: 0 16px;">
-                <img src="<?=ROOT_URL . $book['Thumbnail']?>" alt="Image">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-wrapper">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="<?=ROOT_URL?>">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="<?=ROOT_URL . '/category-book.php?CategoryID=' . $book['CategoryID']?>"><?=$book['CategoryName']?></a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><?=$book['BookTitle']?></li>
+                </ol>
+            </nav>
+        </div>
+
+        <div class="row">
+            <!-- Book Details -->
+            <div class="col-md-4">
+                <div class="book-image-container">
+                    <div class="main-image">
+                        <img src="<?=ROOT_URL . $book['Thumbnail']?>" alt="<?=$book['BookTitle']?>" class="img-fluid">
+                    </div>
+                    <div class="image-actions">
+                    </div>
+                </div>
             </div>
-            <div style="padding: 0 16px;">
-                <h3>Thông tin sản phẩm</h3>
-                <p><b>ISBN: </b><?=$book['ISBN']?></p>
-                <p><b>Tên sách: </b><?=$book['BookTitle']?></p>
-                <p><b>Năm xuất bản: </b><?=$book['PublishYear']?></p>
-                <p><b>Trọng lượng: </b><?=$book['Weight']?> gam</p>
-                <p><b>Kích thước: </b><?=$book['Size']?> mm</p>
-                <p><b>Số trang: </b><?=$book['PageNumber']?></p>
-                <p><b>Giá: </b><?=number_format($book['Price'])?> đồng</p>
-                <p><b>Ngôn ngữ: </b><?=$book['LanguageName']?></p>
-                <p><b>Danh mục: </b><a href="<?=ROOT_URL . '/category-book.php?CategoryID=' . $book['CategoryID']?>"><?=$book['CategoryName']?></a></p>
-                <p><b>Nhà xuất bản: </b><?=$book['PublishName']?></p>
-                <p><b>Mô tả: </b><?=$book['Description']?></p>
+            <div class="col-md-8">
+                <div class="book-info">
+                    <h1 class="book-title"><?=$book['BookTitle']?></h1>
+                    
+                    <div class="book-meta">
+                        <div class="price-section">
+                            <div class="price-wrapper">
+                                <span class="current-price"><?=number_format($book['Price'])?> đ</span>
+                            </div>
+                        </div>
+                        
+                        <div class="book-details-flex mt-3 mb-3">
+                            <div class="book-detail-row">
+                                <div class="book-detail-label">Mã sản phẩm:</div>
+                                <div class="book-detail-value"><?=$book['ISBN']?></div>
+                            </div>
+                            <div class="book-detail-row">
+                                <div class="book-detail-label">Nhà xuất bản:</div>
+                                <div class="book-detail-value"><?=$book['PublishName']?></div>
+                            </div>
+                            <div class="book-detail-row">
+                                <div class="book-detail-label">Năm xuất bản:</div>
+                                <div class="book-detail-value"><?=$book['PublishYear']?></div>
+                            </div>
+                            <div class="book-detail-row">
+                                <div class="book-detail-label">Ngôn ngữ:</div>
+                                <div class="book-detail-value"><?=$book['LanguageName']?></div>
+                            </div>
+                            <div class="book-detail-row">
+                                <div class="book-detail-label">Số trang:</div>
+                                <div class="book-detail-value"><?=$book['PageNumber']?></div>
+                            </div>
+                            <div class="book-detail-row">
+                                <div class="book-detail-label">Kích thước:</div>
+                                <div class="book-detail-value"><?=$book['Size']?></div>
+                            </div>
+                            <div class="book-detail-row">
+                                <div class="book-detail-label">Trọng lượng:</div>
+                                <div class="book-detail-value"><?=$book['Weight']?> gam</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="book-actions">
+                        <div class="quantity-selector">
+                            <label>Số lượng:</label>
+                            <div class="quantity-control">
+                                <button class="btn-quantity" onclick="decreaseQuantity()">-</button>
+                                <input type="number" class="form-control" id="quantity" value="1" min="1">
+                                <button class="btn-quantity" onclick="increaseQuantity()">+</button>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary btn-lg btn-cart" onclick="addToCart('<?=$book['ISBN']?>')">
+                                <i class="fas fa-shopping-cart"></i> Thêm vào giỏ
+                            </button>
+                            <button class="btn btn-danger btn-lg btn-buy" onclick="buyNow('<?=$book['ISBN']?>')">
+                                Mua ngay
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Book Description -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="book-description">
+                    <div class="description-header">
+                        <h3>Mô tả sản phẩm</h3>
+                        <div class="description-tabs">
+                            <button class="tab-btn active" onclick="switchTab('description')">Mô tả</button>
+                            <button class="tab-btn" onclick="switchTab('details')">Chi tiết</button>
+                            <button class="tab-btn" onclick="switchTab('reviews')">Đánh giá</button>
+                        </div>
+                    </div>
+                    <div class="description-content" id="description-content">
+                        <?=$book['Description']?>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+function increaseQuantity() {
+    const input = document.getElementById('quantity');
+    input.value = parseInt(input.value) + 1;
+}
+
+function decreaseQuantity() {
+    const input = document.getElementById('quantity');
+    if (parseInt(input.value) > 1) {
+        input.value = parseInt(input.value) - 1;
+    }
+}
+
+function addToCart(isbn) {
+    const quantity = document.getElementById('quantity').value;
+    alert('Đã thêm vào giỏ hàng!');
+}
+
+function buyNow(isbn) {
+    const quantity = document.getElementById('quantity').value;
+    window.location.href = '<?=ROOT_URL?>/checkout.php?isbn=' + isbn + '&quantity=' + quantity;
+}
+
+function switchTab(tabName) {
+    const tabs = document.querySelectorAll('.tab-btn');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+$(document).ready(function(){
+    $('.book-detail-row').each(function(){
+        var maxHeight = 0;
+        $(this).children().each(function(){
+            if ($(this).height() > maxHeight) maxHeight = $(this).height();
+        });
+        $(this).children().height(maxHeight);
+    });
+});
+</script>
+
 <?php include 'footer.php'?>

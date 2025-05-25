@@ -20,7 +20,8 @@ jQuery(document).ready(function($){
             1000:{
                 items:5,
             }
-        }
+        },
+        navText: ['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>']
     });  
     
     $('.related-products-carousel').owlCarousel({

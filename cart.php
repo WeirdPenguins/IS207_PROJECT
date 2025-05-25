@@ -1,6 +1,10 @@
 <?php include 'header.php'?>
+<link rel="stylesheet" href="<?=ROOT_URL?>/assets/css/mystyle.css">
 
 <?php
+$hasCart = false;
+$totalMoney = 0;
+
     // Thêm sản phẩm vào giỏ hàng
     if (isset($_GET['id'])) {
         $sql = "INSERT INTO Carts VALUES ('" . $_GET['id'] . "', '" . $_SESSION['Username'] . "', 1, NOW(3))";
@@ -55,110 +59,106 @@
             Database::NonQuery($sql);
         }
     }
+
+if (isset($_SESSION['Username'])) {
+    $sql = "SELECT * FROM Carts, Books WHERE Books.ISBN = Carts.ISBN AND Username = '" . $_SESSION['Username'] . "' ORDER BY Carts.UpdatedAt DESC";
+    $carts = Database::GetData($sql);
+    if ($carts) {
+        $hasCart = true;
+        foreach ($carts as $cart) {
+            $totalMoney += $cart['Price'] * $cart['Amount'];
+        }
+    }
+}
 ?>
-<div class="product-big-title-area">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="product-bit-title text-center">
-                    <h2>Giỏ hàng của bạn</h2>
+
+<div class="cart-title-area">
+    <div>
+        <i class="fas fa-shopping-cart"></i>
+        <span>Giỏ hàng của bạn</span>
+    </div>
+</div>
+
+<div class="container cart-container">
+    <div class="cart-left">
+        <?php if (!$hasCart) { ?>
+            <div class="cart-empty">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <div class="cart-empty-title">Giỏ hàng rỗng!</div>
+                    <div class="cart-empty-text">Bạn chưa có giao dịch nào.</div>
+                    <img src="<?=ROOT_URL?>/assets/img/empty-cart.png" alt="empty cart" class="cart-empty-img">
                 </div>
             </div>
+        <?php } else { ?>
+        <form method="post" action="#">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" class="cart-checkbox" id="select-all"></th>
+                        <th>Ảnh</th>
+                        <th>Tên sách</th>
+                        <th>Giá</th>
+                        <th width="125">Số lượng</th>
+                        <th>Thành tiền</th>
+                        <th>Xoá</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($carts as $cart) { ?>
+                    <tr class="cart_item">
+                        <td><input type="checkbox" class="cart-checkbox" name="selected[]" value="<?=$cart['ISBN']?>"></td>
+                        <td><img class="cart-img" src="<?=ROOT_URL . $cart['Thumbnail']?>"></td>
+                        <td class="cart-title"><?=$cart['BookTitle']?></td>
+                        <td>
+                            <span class="cart-price-sale"><?=number_format($cart['Price'])?> đ</span><br>
+                            <span class="cart-price-old"><?=number_format($cart['OldPrice'] ?? ($cart['Price']*1.2))?> đ</span>
+                        </td>
+                        <td>
+                            <div class="cart-qty">
+                                <form method="POST">
+                                    <input name="isbn" value="<?=$cart['ISBN']?>" hidden>
+                                    <button type="submit" name="update_amount" value="-1" class="cart-qty-btn">-</button>
+                                    <input name="amount" type="number" class="cart-qty-input" min="1" value="<?=$cart['Amount']?>">
+                                    <button type="submit" name="update_amount" value="1" class="cart-qty-btn">+</button>
+                                </form>
+                            </div>
+                        </td>
+                        <td><span class="cart-price-sale"><?=number_format($cart['Price'] * $cart['Amount'])?> đ</span></td>
+                        <td>
+                            <a href="?del-cart-id=<?=$cart['ISBN']?>" class="cart-remove-btn" title="Xoá sản phẩm">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+        </form>
+        <?php } ?>
+    </div>
+    <div class="cart-right">
+        <div>
+            <div class="cart-summary-label">Thành tiền</div>
+            <div class="cart-summary-value">0 đ</div>
+            <div class="cart-summary-label">Tổng Số Tiền (gồm VAT)</div>
+            <div class="cart-summary-value" style="font-size:22px; color:#d0021b;">
+                <?=number_format($totalMoney)?> đ
+            </div>
+            <button class="cart-checkout-btn" <?=(!$hasCart || $totalMoney==0)?'disabled':'';?> onclick="window.location.href='?type=payment'">THANH TOÁN</button>
+            <div style="color:#d0021b;font-size:12px;margin-top:8px;">(Giảm giá trên web chỉ áp dụng cho bán lẻ)</div>
         </div>
     </div>
 </div>
 
-<div class="single-product-area">
-    <div class="zigzag-bottom"></div>
-    <div class="container">
-        <div class="product-content-right">
-            <div class="woocommerce">
-                <form method="post" action="#">
-                    <table cellspacing="0" class="shop_table cart">
-                        <thead>
-                            <tr>
-                                <th>ISBN</th>
-                                <th>Tên sách</th>
-                                <th>Ảnh</th>
-                                <th>Giá</th>
-                                <th width="125">Số lượng</th>
-                                <th>Thành tiền</th>
-                                <th>Xoá</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                                if (isset($_SESSION['Username'])) {
-                                    $sql = "SELECT * FROM Carts, Books WHERE Books.ISBN = Carts.ISBN AND Username = '" . $_SESSION['Username'] . "' ORDER BY Carts.UpdatedAt DESC";
-                                    $carts = Database::GetData($sql);
-
-                                    if ($carts) {
-                                    foreach ($carts as $cart) {?>
-                            <tr class="cart_item">
-                                <td class="product-name"><?=$cart['ISBN']?></td>
-                                <td class="product-name"><?=$cart['BookTitle']?></td>
-                                <td class="product-thumbnail"><img class="shop_thumbnail" src="<?=ROOT_URL . $cart['Thumbnail']?>"></td>
-                                <td class="product-name"><?=number_format($cart['Price'])?> đ</td>
-                                <td class="product-quantity">
-                                    <div class="quantity buttons_added">
-                                        <form method="POST">
-                                            <input name="isbn" value="<?=$cart['ISBN']?>" hidden>
-                                            <input name="amount" type="number" size="4" class="input-text qty text" min="1" value="<?=$cart['Amount']?>">
-                                            <button name="update_amount" class="btn btn-primary"><i class="fas fa-save"></i></button>
-                                        </form>
-                                    </div>
-                                </td>
-                                <td class="product-name"><?=number_format($cart['Price'] * $cart['Amount'])?> đ</td>
-                                <td class="product-remove"><a title="Xoá sản phẩm" class="remove" href="?del-cart-id=<?=$cart['ISBN']?>">×</td>
-                            </tr>
-                            <?php }
-                                    }
-                                }
-                            ?>
-                            <tr>
-                                <td class="actions" colspan="6">
-                                    <div class="coupon">
-                                        <label for="coupon_code">Khuyến mãi:</label>
-                                        <input type="text" placeholder="Mã khuyến mãi" value="" id="coupon_code" class="input-text" name="coupon_code">
-                                        <input type="submit" value="Kiểm tra mã" name="apply_coupon" class="button">
-                                    </div>
-                                    <a href="?type=payment" class="btn btn-lg btn-success">Tạo đơn hàng</a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </form>
-
-                <div class="cart-collaterals">
-                    <div class="cart_totals">
-                        <h2>Tổng tiền giỏ hàng</h2>
-                        <?php
-                            $totalMoney = 0;
-                            if (isset($_SESSION['Username'])) {
-                                $sql = "SELECT SUM(Amount * Price) FROM Carts, Books WHERE Carts.ISBN = Books.ISBN AND Username = '" . $_SESSION['Username'] . "'";
-                                $totalMoney = Database::GetData($sql, ['row' => 0, 'cell' => 0]);
-                            }
-                        ?>
-                        <table cellspacing="0">
-                            <tbody>
-                                <tr class="cart-subtotal">
-                                    <th>Tổng đơn hàng: </th>
-                                    <td><span class="amount"><?=number_format($totalMoney)?> đ</span></td>
-                                </tr>
-                                <tr class="shipping">
-                                    <th>Vận chuyển: </th>
-                                    <td>Free Shipping</td>
-                                </tr>
-                                <tr class="order-total">
-                                    <th>Tổng tiền: </th>
-                                    <td><strong><span class="amount"><?=number_format($totalMoney)?> đ</span></strong></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<script src="https://kit.fontawesome.com/4e5b2b7e4b.js" crossorigin="anonymous"></script>
+<script>
+// Chọn tất cả checkbox
+const selectAll = document.getElementById('select-all');
+if (selectAll) {
+    selectAll.addEventListener('change', function() {
+        document.querySelectorAll('.cart-checkbox').forEach(cb => { cb.checked = selectAll.checked; });
+    });
+}
+</script>
 <?php include 'footer.php'?>
