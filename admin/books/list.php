@@ -4,10 +4,24 @@
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Add images
         $image_path = '';
-        if (isset($_FILES['pic'])) {
-            $image_size = $_FILES['pic']['size'];
-            $image_path = '/uploads/' . $_FILES['pic']['name'];
-            move_uploaded_file($_FILES['pic']['tmp_name'], '../../' . $image_path);
+        if (isset($_FILES['pic']) && $_FILES['pic']['error'] == 0) {
+            $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+            $ext = strtolower(pathinfo($_FILES['pic']['name'], PATHINFO_EXTENSION));
+            if (in_array($ext, $allowed)) {
+                $filename = time() . '_' . basename($_FILES['pic']['name']);
+                $upload_dir = '../../assets/img/books/';
+                if (!is_dir($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+                $image_path = '/assets/img/books/' . $filename;
+                move_uploaded_file($_FILES['pic']['tmp_name'], $upload_dir . $filename);
+            } else {
+                $image_path = '';
+                $message = [
+                    'type' => 'warning',
+                    'text' => 'Chỉ cho phép upload file ảnh (jpg, jpeg, png, gif)',
+                ];
+            }
         }
 
         // Add items
@@ -57,7 +71,7 @@
             $publish = isset($_POST['publish']) ? $_POST['publish'] : '';
 
             if (!empty($name)) {
-                $thumbnail_sql = $image_path != '/uploads/' ? "Thumbnail = '$image_path', " : '';
+                $thumbnail_sql = !empty($image_path) ? "Thumbnail = '$image_path', " : '';
                 $sql = "UPDATE Books SET $thumbnail_sql BookTitle = '$name', Description = '$description', PublishYear = '$publish_year', Weight = '$weight', Size = '$size_width x $size_height', PageNumber = $page, LanguageID = '$language', Price = $price, CategoryID = $category, PublishID = $publish, UpdatedAt = NOW(3) WHERE ISBN = $id";
 
                 if (Database::NonQuery($sql)) {
@@ -133,11 +147,11 @@
                         <div class="row">
                             <div class="col-md-6 form-group">
                                 <label>ISBN</label>
-                                <input type="text" name="isbn" class="form-control">
+                                <input type="text" name="isbn" class="form-control" required>
                             </div>
                             <div class="col-md-6 form-group">
                                 <label>Tên sách</label>
-                                <input type="text" name="name" class="form-control">
+                                <input type="text" name="name" class="form-control" required>
                             </div>
                             <div class="col-md-6 form-group">
                                 <label>Mô tả</label>
@@ -145,9 +159,9 @@
                             </div>
                             <div class="col-md-6 form-group">
                                 <label>Năm xuất bản</label>
-                                <select class="form-control" name="publish_year">
+                                <select class="form-control" name="publish_year" required>
                                     <?php
-                                        for ($i = 2016; $i <= 2022; $i++) {
+                                        for ($i = 2016; $i <= 2025; $i++) {
                                             echo "<option value='$i'>$i</option>";
                                         }
                                     ?>
@@ -177,11 +191,11 @@
                             </div>
                             <div class="col-md-6 form-group">
                                 <label>Số trang</label>
-                                <input type="number" name="page" class="form-control">
+                                <input type="number" name="page" class="form-control" required>
                             </div>
                             <div class="col-md-6 form-group">
                                 <label>Hình ảnh</label>
-                                <input type="file" name="pic" class="form-control">
+                                <input type="file" name="pic" class="form-control" required>
                             </div>
                             <div class="col-md-6 form-group">
                                 <label>Ngôn ngữ</label>
@@ -199,11 +213,11 @@
                             </div>
                             <div class="col-md-6 form-group">
                                 <label>Giá</label>
-                                <input type="number" name="price" class="form-control">
+                                <input type="number" name="price" class="form-control" required>
                             </div>
                             <div class="col-md-6 form-group">
                                 <label>Thể loại</label>
-                                <select class="form-control" name="category">
+                                <select class="form-control" name="category" required>
                                     <?php
                                         $sql = 'SELECT * FROM Categories';
                                         $categories = Database::GetData($sql);
@@ -217,7 +231,7 @@
                             </div>
                             <div class="col-md-6 form-group">
                                 <label>Nhà xuất bản</label>
-                                <select class="form-control" name="publish">
+                                <select class="form-control" name="publish" required>
                                     <?php
                                         $sql = 'SELECT * FROM Publishes';
                                         $publishes = Database::GetData($sql);
@@ -244,7 +258,7 @@
             $id = isset($_GET['edit-id']) ? $_GET['edit-id'] : '';
             $book = [];
             if ($id != '') {
-                $sql = "SELECT * FROM Books WHERE ISBN = $id";
+            $sql = "SELECT * FROM Books WHERE ISBN = '$id'";
                 $book = Database::GetData($sql, ['row' => 0]);
             }
         ?>

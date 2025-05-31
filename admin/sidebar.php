@@ -52,7 +52,7 @@
             </li>
             <li class="nav-item">
                 <a href="<?=ADMIN_URL?>/books/list.php" class="nav-link">
-                    <i class="nav-icon fas fa-book"></i>
+                    <i class="nav-icon fas fa-book-open"></i>
                     <p>Sách</p>
                 </a>
             </li>
@@ -64,25 +64,25 @@
             </li>
             <li class="nav-item">
                 <a href="<?=ADMIN_URL?>/orders/list.php" class="nav-link">
-                    <i class="nav-icon fas fa-truck-loading"></i>
+                    <i class="nav-icon fas fa-receipt"></i>
                     <p>Đơn hàng</p>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="<?=ADMIN_URL?>/users/list.php" class="nav-link">
-                    <i class="nav-icon fas fa-user-circle"></i>
+                    <i class="nav-icon fas fa-user"></i>
                     <p>Tài khoản</p>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="<?=ADMIN_URL?>/sliders/list.php" class="nav-link">
-                    <i class="nav-icon fas fa-images"></i>
+                    <i class="nav-icon fas fa-photo-video"></i>
                     <p>Slider</p>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="<?=ADMIN_URL?>/vouchers/list.php" class="nav-link">
-                    <i class="nav-icon fas fa-ticket-alt"></i>
+                    <i class="nav-icon fas fa-percent"></i>
                     <p>Khuyến mãi</p>
                 </a>
             </li>

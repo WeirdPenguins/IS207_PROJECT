@@ -79,10 +79,10 @@
                                     }
 
                                     $sql = "SELECT * FROM Orders $keyword ORDER BY CreatedAt DESC LIMIT " . $pager['StartIndex'] . ', ' . ROW_OF_PAGE;
-                                    $ordes = Database::GetData($sql);
+                                    $orders = Database::GetData($sql);
 
-                                    if ($ordes) {
-                                        foreach ($ordes as $order) {
+                                    if ($orders) {
+                                        foreach ($orders as $order) {
                                             $paymentBtn = $order['Status'] == 0 ? '<a href="?payment=' . $order['OrderID'] . '" class="btn btn-success">Thanh toán</a>' : '';
                                             echo '
                                                 <tr>
