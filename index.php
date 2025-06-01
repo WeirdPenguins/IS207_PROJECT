@@ -65,7 +65,7 @@
                     <h2 class="section-title">Sản phẩm mới nhất</h2>
                     <div class="product-carousel">
                         <?php
-                            $sql = 'SELECT * FROM Books ORDER BY UpdatedAt LIMIT 5';
+                            $sql = 'SELECT * FROM Books ORDER BY UpdatedAt DESC LIMIT 5';
                             $books = Database::GetData($sql);
                             foreach ($books as $book) {
                         ?>
