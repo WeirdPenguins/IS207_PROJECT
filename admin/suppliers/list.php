@@ -81,7 +81,7 @@
 
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="<?=ADMIN_URL?>/dasboard/" class="brand-link">
-        <img src="<?=ROOT_URL?>/assets/img/bht_bookstore_logo.png" alt="BHT Bookstore" style="width: 100%">
+        <img src="<?=ROOT_URL?>/assets/img/Rebook_logo.png" alt="Rebook logo" style="width: 100%">
     </a>
     <?php include '../sidebar.php'?>
 </aside>

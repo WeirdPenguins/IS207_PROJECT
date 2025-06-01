@@ -118,44 +118,7 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-function increaseQuantity() {
-    const input = document.getElementById('quantity');
-    input.value = parseInt(input.value) + 1;
-}
+<script src="assets/js/book-details.js"></script>
 
-function decreaseQuantity() {
-    const input = document.getElementById('quantity');
-    if (parseInt(input.value) > 1) {
-        input.value = parseInt(input.value) - 1;
-    }
-}
-
-function addToCart(isbn) {
-    const quantity = document.getElementById('quantity').value;
-    alert('Đã thêm vào giỏ hàng!');
-}
-
-function buyNow(isbn) {
-    const quantity = document.getElementById('quantity').value;
-    window.location.href = '<?=ROOT_URL?>/checkout.php?isbn=' + isbn + '&quantity=' + quantity;
-}
-
-function switchTab(tabName) {
-    const tabs = document.querySelectorAll('.tab-btn');
-    tabs.forEach(tab => tab.classList.remove('active'));
-    event.target.classList.add('active');
-}
-
-$(document).ready(function(){
-    $('.book-detail-row').each(function(){
-        var maxHeight = 0;
-        $(this).children().each(function(){
-            if ($(this).height() > maxHeight) maxHeight = $(this).height();
-        });
-        $(this).children().height(maxHeight);
-    });
-});
-</script>
 
 <?php include 'footer.php'?>

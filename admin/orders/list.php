@@ -10,7 +10,7 @@
 
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="<?=ADMIN_URL?>/dasboard/" class="brand-link">
-        <img src="<?=ROOT_URL?>/assets/img/bht_bookstore_logo.png" alt="BHT Bookstore" style="width: 100%">
+        <img src="<?=ROOT_URL?>/assets/img/Rebook_logo.png" alt="Rebook logo" style="width: 100%">
     </a>
     <?php include '../sidebar.php'?>
 </aside>
@@ -79,10 +79,10 @@
                                     }
 
                                     $sql = "SELECT * FROM Orders $keyword ORDER BY CreatedAt DESC LIMIT " . $pager['StartIndex'] . ', ' . ROW_OF_PAGE;
-                                    $ordes = Database::GetData($sql);
+                                    $orders = Database::GetData($sql);
 
-                                    if ($ordes) {
-                                        foreach ($ordes as $order) {
+                                    if ($orders) {
+                                        foreach ($orders as $order) {
                                             $paymentBtn = $order['Status'] == 0 ? '<a href="?payment=' . $order['OrderID'] . '" class="btn btn-success">Thanh toán</a>' : '';
                                             echo '
                                                 <tr>

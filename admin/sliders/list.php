@@ -2,13 +2,26 @@
 
 <?php
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        // Add images
-        $image_path = '';
-        if (isset($_FILES['pic'])) {
-            $image_size = $_FILES['pic']['size'];
-            $image_path = '/uploads/' . $_FILES['pic']['name'];
-            move_uploaded_file($_FILES['pic']['tmp_name'], '../../' . $image_path);
+       // Add images
+    $image_path = '';
+    if (isset($_FILES['pic']) && $_FILES['pic']['error'] == 0) {
+        $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+        $ext = strtolower(pathinfo($_FILES['pic']['name'], PATHINFO_EXTENSION));
+        if (in_array($ext, $allowed)) {
+            $upload_dir = '../../assets/img/sliders/';
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0777, true);
+            }
+            $image_path = '/assets/img/sliders/' . basename($_FILES['pic']['name']);
+            move_uploaded_file($_FILES['pic']['tmp_name'], $upload_dir . basename($_FILES['pic']['name']));
+        } else {
+            $image_path = '';
+            $message = [
+                'type' => 'warning',
+                'text' => 'Chỉ cho phép upload file ảnh (jpg, jpeg, png, gif)',
+            ];
         }
+    }
 
         // Add items
         if (isset($_POST['action']) && $_POST['action'] == 'add') {
@@ -41,7 +54,7 @@
             $status = isset($_POST['status']) ? $_POST['status'] : '';
 
             if (!empty($name)) {
-                $thumbnail_sql = $image_path != '/uploads/' ? "Thumbnail = '$image_path', " : '';
+                $thumbnail_sql = !empty($image_path) ? "Thumbnail = '$image_path', " : '';
                 $sql = "UPDATE Sliders SET SliderName = '$name', Description = '$description', $thumbnail_sql Status = $status WHERE SliderID = $id";
                 if (Database::NonQuery($sql)) {
                     $message = [
@@ -74,7 +87,7 @@
 
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="<?=ADMIN_URL?>/dasboard/" class="brand-link">
-        <img src="<?=ROOT_URL?>/assets/img/bht_bookstore_logo.png" alt="BHT Bookstore" style="width: 100%">
+        <img src="<?=ROOT_URL?>/assets/img/Rebook_logo.png" alt="Rebook logo" style="width: 100%">
     </a>
     <?php include '../sidebar.php'?>
 </aside>
@@ -162,15 +175,15 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label>Mã slider</label>
-                            <input type="text" name="id" value="<?=$slider['SliderID']?>" class="form-control" disabled>
+                            <input type="text" name="id" value="<?=isset($slider['SliderID']) ? $slider['SliderID'] : ''?>" class="form-control" disabled>
                         </div>
                         <div class="form-group">
                             <label>Tên slider</label>
-                            <input type="text" name="name" value="<?=$slider['SliderName']?>" class="form-control">
+                            <input type="text" name="name" value="<?=isset($slider['SliderName']) ? $slider['SliderName'] : ''?>" class="form-control">
                         </div>
                         <div class="form-group">
                             <label>Mô tả</label>
-                            <input type="text" name="description" value="<?=$slider['Description']?>" class="form-control">
+                            <input type="text" name="description" value="<?=isset($slider['Description']) ? $slider['Description'] : ''?>" class="form-control">
                         </div>
                         <div class="form-group">
                             <label>Hình ảnh</label>
