@@ -1,4 +1,3 @@
-
 <?php include '../header.php'?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -73,7 +72,7 @@
                             <h4 class="mb-0">Tổng số đơn hàng theo năm</h4>
                         </div>
                         <div class="card-body bg-light">
-                            <canvas id="ordersOfYear"></canvas>
+                            <canvas id="ordersOfYear" height="320"></canvas>
                         </div>
                     </div>
                 </div>
@@ -84,7 +83,7 @@
                             <h4 class="mb-0">Doanh thu theo năm</h4>
                         </div>
                         <div class="card-body bg-light">
-                            <canvas id="moneyOfYear"></canvas>
+                            <canvas id="moneyOfYear" height="320"></canvas>
                         </div>
                     </div>
                 </div>
@@ -136,6 +135,8 @@
         type: 'bar',
         data: data,
         options: {
+            responsive: false,
+            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true
@@ -148,6 +149,8 @@
         type: 'line',
         data: data1,
         options: {
+            responsive: false,
+            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true

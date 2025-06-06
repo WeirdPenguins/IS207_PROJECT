@@ -38,9 +38,11 @@
             $price = isset($_POST['price']) ? $_POST['price'] : '';
             $category = isset($_POST['category']) ? $_POST['category'] : '';
             $publish = isset($_POST['publish']) ? $_POST['publish'] : '';
+            $author = isset($_POST['author']) ? $_POST['author'] : '';
 
             if (!empty($name)) {
-                $sql = "INSERT INTO Books VALUES ('$isbn', '$name', '$description', $publish_year, $weight, '$size_width x $size_height', $page, '$image_path', '$language', $price, 0, 0, $category, $publish, NOW(3))";
+                $sql = "INSERT INTO Books (ISBN, BookTitle, Description, PublishYear, Weight, Size, PageNumber, Thumbnail, LanguageID, Price, CategoryID, PublishID, UpdatedAt, AuthorID)
+                        VALUES ('$isbn', '$name', '$description', $publish_year, $weight, '$size_width x $size_height', $page, '$image_path', '$language', $price, $category, $publish, NOW(3), '$author')";
                 if (Database::NonQuery($sql)) {
                     $message = [
                         'type' => 'success',
@@ -69,11 +71,11 @@
             $price = isset($_POST['price']) ? $_POST['price'] : '';
             $category = isset($_POST['category']) ? $_POST['category'] : '';
             $publish = isset($_POST['publish']) ? $_POST['publish'] : '';
+            $author = isset($_POST['author']) ? $_POST['author'] : '';
 
             if (!empty($name)) {
                 $thumbnail_sql = !empty($image_path) ? "Thumbnail = '$image_path', " : '';
-                $sql = "UPDATE Books SET $thumbnail_sql BookTitle = '$name', Description = '$description', PublishYear = '$publish_year', Weight = '$weight', Size = '$size_width x $size_height', PageNumber = $page, LanguageID = '$language', Price = $price, CategoryID = $category, PublishID = $publish, UpdatedAt = NOW(3) WHERE ISBN = $id";
-
+                $sql = "UPDATE Books SET $thumbnail_sql BookTitle = '$name', Description = '$description', PublishYear = '$publish_year', Weight = '$weight', Size = '$size_width x $size_height', PageNumber = $page, LanguageID = '$language', Price = $price, CategoryID = $category, PublishID = $publish, UpdatedAt = NOW(3), AuthorID = '$author' WHERE ISBN = '$id'";
                 if (Database::NonQuery($sql)) {
                     $message = [
                         'type' => 'success',
@@ -92,6 +94,10 @@
     // Delete items
     if (isset($_GET['del-id'])) {
         $id = isset($_GET['del-id']) ? $_GET['del-id'] : '';
+        Database::NonQuery("DELETE FROM composers WHERE ISBN = $id");
+        Database::NonQuery("DELETE FROM Order_Details WHERE ISBN = $id");
+        Database::NonQuery("DELETE FROM Carts WHERE ISBN = $id");
+        Database::NonQuery("DELETE FROM rating WHERE ISBN = $id");
         $sql = "DELETE FROM Books WHERE ISBN = $id";
 
         if (Database::NonQuery($sql)) {
@@ -243,6 +249,21 @@
                                     ?>
                                 </select>
                             </div>
+                            <div class="col-md-12 form-group">
+                                <label>Tác giả</label>
+                                <select class="form-control" name="author" required>
+                                    <option value="">Chọn tác giả</option>
+                                    <?php
+                                        $sql = 'SELECT * FROM Authors';
+                                        $authors = Database::GetData($sql);
+                                        if ($authors) {
+                                            foreach ($authors as $author) {
+                                                echo '<option value="' . $author['AuthorID'] . '">' . $author['AuthorName'] . '</option>';
+                                            }
+                                        }
+                                    ?>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -258,7 +279,7 @@
             $id = isset($_GET['edit-id']) ? $_GET['edit-id'] : '';
             $book = [];
             if ($id != '') {
-            $sql = "SELECT * FROM Books WHERE ISBN = '$id'";
+                $sql = "SELECT * FROM Books WHERE ISBN = '$id'";
                 $book = Database::GetData($sql, ['row' => 0]);
             }
         ?>
@@ -289,7 +310,7 @@
                                 <label>Năm xuất bản</label>
                                 <select class="form-control" name="publish_year">
                                     <?php
-                                        for ($i = 2016; $i <= 2022; $i++) {
+                                        for ($i = 2016; $i <= 2025; $i++) {
                                             $selected = $i == $book['PublishYear'] ? 'selected' : '';
                                             echo "<option value='$i' $selected>$i</option>";
                                         }
@@ -376,6 +397,22 @@
                                     ?>
                                 </select>
                             </div>
+                            <div class="col-md-12 form-group">
+                                <label>Tác giả</label>
+                                <select class="form-control" name="author" required>
+                                    <option value="">Chọn tác giả</option>
+                                    <?php
+                                        $sql = 'SELECT * FROM Authors';
+                                        $authors = Database::GetData($sql);
+                                        if ($authors) {
+                                            foreach ($authors as $author) {
+                                                $selected = (isset($book['AuthorID']) && $book['AuthorID'] == $author['AuthorID']) ? 'selected' : '';
+                                                echo '<option value="' . $author['AuthorID'] . '" ' . $selected . '>' . $author['AuthorName'] . '</option>';
+                                            }
+                                        }
+                                    ?>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -409,6 +446,7 @@
                                 <tr>
                                     <th>ISBN</th>
                                     <th>Tên sách</th>
+                                    <th>Tác giả</th>
                                     <th>Hình ảnh</th>
                                     <th>Ngôn ngữ</th>
                                     <th>Giá</th>
@@ -426,7 +464,14 @@
                                         $keyword = "AND BookTitle LIKE '%$keyword%'";
                                     }
 
-                                    $sql = "SELECT * FROM Books, Languages, Categories WHERE Books.LanguageID = Languages.LanguageID AND Books.CategoryID = Categories.CategoryID $keyword ORDER BY UpdatedAt DESC LIMIT " . $pager['StartIndex'] . ', ' . ROW_OF_PAGE;
+                                    $sql = "SELECT Books.*, Languages.LanguageName, Categories.CategoryName, Authors.AuthorName
+                                            FROM Books
+                                            LEFT JOIN Languages ON Books.LanguageID = Languages.LanguageID
+                                            LEFT JOIN Categories ON Books.CategoryID = Categories.CategoryID
+                                            LEFT JOIN Authors ON Books.AuthorID = Authors.AuthorID
+                                            WHERE 1=1 $keyword
+                                            ORDER BY UpdatedAt DESC
+                                            LIMIT " . $pager['StartIndex'] . ', ' . ROW_OF_PAGE;
                                     $books = Database::GetData($sql);
 
                                     if ($books) {
@@ -435,6 +480,7 @@
                                                 <tr>
                                                     <th>' . $book['ISBN'] . '</th>
                                                     <td>' . $book['BookTitle'] . '</td>
+                                                    <td>' . htmlspecialchars($book['AuthorName']) . '</td>
                                                     <td class="text-center"><img height="60" src="' . ROOT_URL . $book['Thumbnail'] . '" alt="" /></td>
                                                     <td>' . $book['LanguageName'] . '</td>
                                                     <td>' . number_format($book['Price']) . '</td>

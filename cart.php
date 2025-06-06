@@ -153,8 +153,6 @@ if ($voucher_discount > 0) {
             </div>
         </form>
         <div>
-            <div class="cart-summary-label">Thành tiền</div>
-            <div class="cart-summary-value" id="cart-total"><?=number_format($totalMoney)?> đ</div>
             <div id="voucher-discount-area">
                 <?php if ($voucher_discount > 0) { ?>
                     <div class="cart-summary-label" style="color:green;">Giảm giá (<?=$voucher_discount?>%)</div>

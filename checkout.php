@@ -62,15 +62,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['bank_transfer'])) {
     }
     Database::NonQuery($sql);
 
-    // Hiển thị hướng dẫn chuyển khoản
-    echo "<div class='alert alert-success'>
-        Đơn hàng của bạn đã được tạo!<br>
-        Vui lòng chuyển khoản <b>" . number_format($totalMoney) . " đ</b> tới tài khoản ngân hàng sau:<br>
-        <b>Ngân hàng:</b> Vietcombank<br>
-        <b>Số tài khoản:</b> 0123456789<br>
-        <b>Chủ tài khoản:</b> NGUYEN VAN A<br>
-        <b>Nội dung chuyển khoản:</b> THANHTOAN $orderID<br>
-        Sau khi chuyển khoản, đơn hàng sẽ được xác nhận!
+    // Hiển thị hướng dẫn chuyển khoản với QR động
+    echo "<div style='display:flex;justify-content:center;align-items:center;min-height:60vh;'>
+        <div class='alert alert-success' style='font-size:18px;max-width:500px;margin:auto;text-align:center;'>
+            Đơn hàng của bạn đã được tạo!<br>
+            <b>Vui lòng chuyển khoản <span style=\"color:#006266;\">" . number_format($totalMoney) . " đ</span> tới tài khoản ngân hàng sau hoặc quét mã QR:</b><br>
+            <b>Ngân hàng:</b> BIDV<br>
+            <b>Số tài khoản:</b> 8831924445<br>
+            <b>Chủ tài khoản:</b> DUONG PHAT VINH<br>
+            <b>Nội dung chuyển khoản:</b> THANHTOAN $orderID<br>
+            <div style='margin:18px 0;'>
+                <img src=\"https://img.vietqr.io/image/bidv-8831924445-compact2.png?amount=$totalMoney&addInfo=THANHTOAN%20$orderID&accountName=DUONG%20PHAT%20VINH\" alt=\"QR chuyển khoản\" style=\"max-width:320px;width:100%;background:#fff;padding:8px;border-radius:8px;\">
+            </div>
+            Sau khi chuyển khoản, đơn hàng sẽ được xác nhận!
+        </div>
     </div>";
     include 'footer.php';
     exit;
@@ -109,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['bank_transfer'])) {
             <div style="font-size:18px;font-weight:bold;">Tổng tiền: <?=number_format($totalMoney)?> đ</div>
         </div>
         <form method="post">
-            <button type="submit" name="bank_transfer" class="btn btn-success btn-lg mt-3">Thanh toán VNPAY</button>
+            <button type="submit" name="bank_transfer" class="btn btn-success btn-lg mt-3">Thanh toán chuyển khoản QR</button>
             <button type="button" class="btn btn-secondary btn-lg mt-3" style="margin-left:10px;" onclick="window.location.href='shop.php'">Tiếp tục mua hàng</button>
         </form>
     <?php } ?>
