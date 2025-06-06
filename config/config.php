@@ -1,6 +1,6 @@
 <?php
 // URL
-const ROOT_URL = '/IS207_PROJECT';
+const ROOT_URL = '/IS208_PROJECT';
 const ADMIN_URL = ROOT_URL . '/admin';
 const ADMIN_TEMPLATE_URL = ROOT_URL . '/vendor/Admin-LTE';
 const HOME_TEMPLATE_URL = ROOT_URL . '/vendor/Home';
