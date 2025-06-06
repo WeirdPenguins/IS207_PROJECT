@@ -2,7 +2,7 @@
 <?php
 session_start();
 include 'config/config.php';
-include 'config/Database.php';
+include 'config/database.php';
 
 header('Content-Type: application/json');
 

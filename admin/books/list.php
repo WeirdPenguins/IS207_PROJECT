@@ -92,6 +92,10 @@
     // Delete items
     if (isset($_GET['del-id'])) {
         $id = isset($_GET['del-id']) ? $_GET['del-id'] : '';
+        Database::NonQuery("DELETE FROM composers WHERE ISBN = $id");
+        Database::NonQuery("DELETE FROM Order_Details WHERE ISBN = $id");
+        Database::NonQuery("DELETE FROM Carts WHERE ISBN = $id");
+        Database::NonQuery("DELETE FROM rating WHERE ISBN = $id");
         $sql = "DELETE FROM Books WHERE ISBN = $id";
 
         if (Database::NonQuery($sql)) {

@@ -172,7 +172,6 @@
                                                     <td>' . Helper::StatusBadge($user['Status']) . '</td>
                                                     <td>' . Helper::AccountTypeBadge($user['AccountTypeID']) . '</td>
                                                     <td>
-                                                        <a href="?reset-password-id=' . $user['Username'] . '"class="btn btn-info"><i class="fas fa-key"></i></a>
                                                         <a href="?edit-id=' . $user['Username'] . '"class="btn btn-warning"><i class="fas fa-marker"></i></a>
                                                     </td>
                                                 </tr>

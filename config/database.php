@@ -18,6 +18,22 @@ class Database
         return $connect;
     }
 
+ /**
+     * Chuẩn bị câu truy vấn Prepared Statement
+     * @param string $query Câu truy vấn
+     * @return mysqli_stmt
+     */
+    public static function Prepare($query)
+    {
+        $connect = self::Connect();
+        $stmt = $connect->prepare($query);
+        if ($stmt === false) {
+            throw new Exception('Prepare failed: ' . $connect->error);
+        }
+        return $stmt;
+    }
+
+
     /**
      * Sử dụng cho câu truy vấn SELECT
      * @param string $query Câu truy vấn
