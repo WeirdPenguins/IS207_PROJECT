@@ -3,6 +3,7 @@
 <?php session_start();?>
 <!DOCTYPE html>
 <html lang="en">
+<link href="<?=ROOT_URL . '/assets/css/profile.css'?>" rel="stylesheet">
 
 <head>
     <meta charset="UTF-8">
@@ -72,5 +73,32 @@
         ?>
     </div>
 </body>
+
+<script>
+document.querySelector('form').addEventListener('submit', function(e) {
+    const fullname = document.querySelector('input[name="fullname"]').value.trim();
+    const phone = document.querySelector('input[name="phone"]').value.trim();
+    const email = document.querySelector('input[name="email"]').value.trim();
+    let errors = [];
+
+    if (fullname.length < 3) {
+        errors.push("Họ tên phải có ít nhất 3 ký tự.");
+    }
+
+    if (!/^(0[3|5|7|8|9])+([0-9]{8})$/.test(phone)) {
+        errors.push("Số điện thoại không hợp lệ.");
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errors.push("Email không hợp lệ.");
+    }
+
+    if (errors.length > 0) {
+        e.preventDefault();
+        alert(errors.join('\n'));
+    }
+});
+</script>
+
 
 </html>
