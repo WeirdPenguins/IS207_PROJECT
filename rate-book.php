@@ -1,13 +1,11 @@
 <?php
-// Prevent any output before JSON response
 ob_start();
 
 error_reporting(E_ALL);
-ini_set('display_errors', 0); // Turn off error display
+ini_set('display_errors', 0); 
 session_start();
 header('Content-Type: application/json');
 
-// Include database configuration
 require_once 'config/database.php';
 
 // Constants
@@ -45,7 +43,6 @@ try {
 
     $requestData = $requestMethod === 'POST' ? $_POST : $_GET;
 
-    // Input validation
     if (!isset($requestData['isbn']) || !isset($requestData['point'])) {
         sendJsonResponse(false, 'Missing required fields');
     }
@@ -55,43 +52,35 @@ try {
     $comment = isset($requestData['comment']) ? trim($requestData['comment']) : '';
     $username = $_SESSION['Username'];
 
-    // Validate ISBN format (13 digits)
     if (!preg_match('/^\d{13}$/', $isbn)) {
         sendJsonResponse(false, 'Invalid ISBN format');
     }
 
-    // Validate rating point
     if ($point === false || $point < MIN_RATING || $point > MAX_RATING) {
         sendJsonResponse(false, 'Invalid rating point. Must be between ' . MIN_RATING . ' and ' . MAX_RATING);
     }
 
-    // Validate comment length
     if (strlen($comment) > MAX_COMMENT_LENGTH) {
         sendJsonResponse(false, 'Comment is too long. Maximum length is ' . MAX_COMMENT_LENGTH . ' characters');
     }
 
-    // Escape values for SQL
     $isbn = addslashes($isbn);
     $username = addslashes($username);
     $comment = addslashes($comment);
     
-    // Check if book exists
     $checkBookSql = "SELECT ISBN FROM books WHERE ISBN = '$isbn'";
     $bookExists = Database::GetData($checkBookSql, ['row' => 0]);
     if (!$bookExists) {
         sendJsonResponse(false, 'Book not found');
     }
     
-    // Check if user has already rated this book
     $sql = "SELECT * FROM rating WHERE ISBN = '$isbn' AND Username = '$username'";
     $existingRating = Database::GetData($sql, ['row' => 0]);
 
     try {
         if ($existingRating) {
-            // Update existing rating
             $sql = "UPDATE rating SET Point = $point, Comment = '$comment', UpdatedAt = CURRENT_TIMESTAMP(3) WHERE ISBN = '$isbn' AND Username = '$username'";
         } else {
-            // Insert new rating
             $sql = "INSERT INTO rating (ISBN, Username, Point, Comment) VALUES ('$isbn', '$username', $point, '$comment')";
         }
 

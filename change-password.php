@@ -9,7 +9,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đổi mật khẩu</title>
     <link rel="icon" href="<?=ROOT_URL?>/assets/img/favicon.png" />
-    <link rel="stylesheet" href="<?=ROOT_URL . '/assets/css/style.css'?>">
+    <link rel="stylesheet" href="<?=ROOT_URL . '/assets/css/profile.css'?>">
+    <style>
+        .profile__form--body input[type="password"] {
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        .profile__form--body input[type="password"]:focus {
+            outline: none;
+            border: 1px solid #48CFAD;
+        }
+    </style>
 </head>
 
 <?php
@@ -36,7 +50,7 @@
     }
 ?>
 
-<body class="profile__bg d-flex-center">
+<body class="profile__bg">
     <div class="profile__form">
         <div class="profile__form--header">
             <h3>Đổi mật khẩu</h3>
@@ -44,15 +58,15 @@
         <form class="profile__form--body" method="POST">
             <div class="profile__group">
                 <b>Mật khẩu cũ: </b>
-                <input type="password" name="re-pass">
+                <input type="password" name="re-pass" required>
             </div>
             <div class="profile__group">
                 <b>Mật khẩu mới: </b>
-                <input type="password" name="pass-1">
+                <input type="password" name="pass-1" required>
             </div>
             <div class="profile__group">
                 <b>Nhập lại mật khẩu mới: </b>
-                <input type="password" name="pass-2">
+                <input type="password" name="pass-2" required>
             </div>
             <div class="profile__group">
                 <input class="btn" name="submit" type="submit" value="Đổi mật khẩu">

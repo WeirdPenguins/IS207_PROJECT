@@ -1,5 +1,8 @@
-<?php include './config/config.php';?>
-<?php include './config/Database.php';?>
+<?php 
+session_start();
+include './config/config.php';
+include './config/database.php';
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -8,7 +11,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://kit.fontawesome.com/64d58efce2.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="./assets/css/sign.css" />
+    <link rel="stylesheet" href="<?= ROOT_URL ?>/assets/css/sign.css" />
     <title>Đăng ký và đăng nhập</title>
 </head>
 
@@ -22,13 +25,12 @@
             $sql = "SELECT * FROM Users WHERE (Username = '$username' OR Phone = '$username' OR Email = '$username') AND Password = sha1('$password') AND Status = 1";
             $users = Database::GetData($sql);
             if ($users != null) {
-                session_start();
                 $user = $users[0];
                 $_SESSION['Username'] = $user['Username'];
                 $_SESSION['DisplayName'] = $user['Fullname'] == '' ? $user['Username'] : $user['Fullname'];
                 $_SESSION['Avatar'] = $user['Avatar'];
                 $_SESSION['Role'] = $user['AccountTypeID'];
-                header('Location: admin/index.php');
+                header('Location: ' . ROOT_URL . '/index.php');
             } else {
                 $message = "<p style='color: red'>Tên đăng nhập hoặc mật khẩu không hợp lệ!</p>";
             }
