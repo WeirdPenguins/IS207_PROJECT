@@ -47,7 +47,7 @@ function initializeRatingHandlers() {
     });
 
     if (newSubmitRatingBtn) {
-        newSubmitRatingBtn.addEventListener('click', function() {
+        newSubmitRatingBtn.addEventListener('click', async function() {
             if (!selectedPoint) {
                 alert('Vui lòng chọn số sao đánh giá!');
                 return;
@@ -56,24 +56,40 @@ function initializeRatingHandlers() {
             const comment = document.getElementById('rating-comment').value;
             const isbn = newRatingStarBtns[0].dataset.isbn;
 
-            // Create form data
-            const formData = new FormData();
-            formData.append('isbn', isbn);
-            formData.append('point', selectedPoint);
-            formData.append('comment', comment);
+            try {
+                // Create form data
+                const formData = new FormData();
+                formData.append('isbn', isbn);
+                formData.append('point', selectedPoint);
+                formData.append('comment', comment);
 
-            // Send POST request
-            fetch('rate-book.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
+                console.log('Sending rating data:', {
+                    isbn: isbn,
+                    point: selectedPoint,
+                    comment: comment
+                });
+
+                // Send POST request
+                const response = await fetch('rate-book.php', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    const errorText = await response.text();
+                    console.error('Server response:', errorText);
+                    throw new Error(`Server error: ${response.status} - ${errorText}`);
                 }
-                return response.json();
-            })
-            .then(data => {
+
+                const data = await response.json();
+                console.log('Response data:', data);
+                
                 if (data.success) {
                     // Update the rating section with new HTML
                     const ratingSection = document.querySelector('.rating-section');
@@ -85,55 +101,10 @@ function initializeRatingHandlers() {
                 } else {
                     alert(data.message || 'Có lỗi xảy ra khi gửi đánh giá!');
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Có lỗi xảy ra khi gửi đánh giá!');
-            });
+            } catch (error) {
+                console.error('Error details:', error);
+                alert('Có lỗi xảy ra khi gửi đánh giá: ' + error.message);
+            }
         });
     }
 }
-
-function submitRating(isbn, point, comment) {
-    const formData = new FormData();
-    formData.append('isbn', isbn);
-    formData.append('point', point);
-    formData.append('comment', comment);
-
-    fetch('rate-book.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            // Cập nhật UI với đánh giá mới
-            document.querySelector('.review-list').innerHTML = data.html;
-            alert('Đánh giá thành công!');
-        } else {
-            alert(data.message || 'Có lỗi xảy ra');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Có lỗi xảy ra khi gửi đánh giá');
-    });
-}
-
-// Thêm event listener cho nút đánh giá
-document.addEventListener('DOMContentLoaded', function() {
-    const submitButton = document.getElementById('submit-rating');
-    if (submitButton) {
-        submitButton.addEventListener('click', function() {
-            const isbn = this.closest('.your-rating-box').querySelector('.rating-star-btn').dataset.isbn;
-            const point = document.querySelector('.rating-star-btn[style*="color: #ffc107"]')?.dataset.point || 5;
-            const comment = document.getElementById('rating-comment').value;
-            submitRating(isbn, point, comment);
-        });
-    }
-});

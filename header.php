@@ -79,7 +79,7 @@ if (session_status() === PHP_SESSION_NONE) {
                             $countItem = Database::GetData($sql, ['row' => 0, 'cell' => 0]);
                         }
                         ?>
-                        <a href="<?= ROOT_URL . '/cart.php' ?>" class="cart-icon">
+                        <a href="<?= isset($_SESSION['Username']) ? ROOT_URL . '/cart.php' : ROOT_URL . '/sign.php' ?>" class="cart-icon">
                             <i class="fas fa-shopping-cart"></i>
                             <span class="cart-count"><?= $countItem ?></span>
                         </a>

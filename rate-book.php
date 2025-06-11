@@ -1,17 +1,31 @@
 <?php
+// Prevent any output before JSON response
 ob_start();
 
 error_reporting(E_ALL);
-ini_set('display_errors', 0); 
-session_start();
-header('Content-Type: application/json');
+ini_set('display_errors', 0); // Turn off error display
+ini_set('log_errors', 1); // Enable error logging
+ini_set('error_log', 'php_errors.log'); // Set error log file
 
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Set headers
+header('Content-Type: application/json');
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
+
+// Include database configuration
 require_once 'config/database.php';
 
 // Constants
 define('MIN_RATING', 1);
 define('MAX_RATING', 5);
 define('MAX_COMMENT_LENGTH', 1000);
+define('ROOT_URL', '/Rebook'); // Add ROOT_URL constant
 
 function sendJsonResponse($success, $message, $html = null) {
     // Clear any previous output
@@ -30,20 +44,30 @@ function sendJsonResponse($success, $message, $html = null) {
 }
 
 try {
+    // Log request data for debugging
+    error_log("Request Method: " . $_SERVER['REQUEST_METHOD']);
+    error_log("POST Data: " . print_r($_POST, true));
+    error_log("GET Data: " . print_r($_GET, true));
+    error_log("Session Data: " . print_r($_SESSION, true));
+
     // Validate session
     if (!isset($_SESSION['Username'])) {
+        error_log("Session validation failed: Username not set");
         sendJsonResponse(false, 'Bạn cần đăng nhập để đánh giá!');
     }
 
     // Validate request method
     $requestMethod = $_SERVER['REQUEST_METHOD'];
     if (!in_array($requestMethod, ['POST', 'GET'])) {
+        error_log("Invalid request method: " . $requestMethod);
         sendJsonResponse(false, 'Invalid request method');
     }
 
     $requestData = $requestMethod === 'POST' ? $_POST : $_GET;
 
+    // Input validation
     if (!isset($requestData['isbn']) || !isset($requestData['point'])) {
+        error_log("Missing required fields. Request data: " . print_r($requestData, true));
         sendJsonResponse(false, 'Missing required fields');
     }
 
@@ -52,50 +76,70 @@ try {
     $comment = isset($requestData['comment']) ? trim($requestData['comment']) : '';
     $username = $_SESSION['Username'];
 
+    error_log("Processing rating - ISBN: $isbn, Point: $point, Username: $username");
+
+    // Validate ISBN format (13 digits)
     if (!preg_match('/^\d{13}$/', $isbn)) {
+        error_log("Invalid ISBN format: $isbn");
         sendJsonResponse(false, 'Invalid ISBN format');
     }
 
+    // Validate rating point
     if ($point === false || $point < MIN_RATING || $point > MAX_RATING) {
+        error_log("Invalid rating point: $point");
         sendJsonResponse(false, 'Invalid rating point. Must be between ' . MIN_RATING . ' and ' . MAX_RATING);
     }
 
+    // Validate comment length
     if (strlen($comment) > MAX_COMMENT_LENGTH) {
+        error_log("Comment too long: " . strlen($comment) . " characters");
         sendJsonResponse(false, 'Comment is too long. Maximum length is ' . MAX_COMMENT_LENGTH . ' characters');
     }
 
+    // Escape values for SQL
     $isbn = addslashes($isbn);
     $username = addslashes($username);
     $comment = addslashes($comment);
     
+    // Check if book exists
     $checkBookSql = "SELECT ISBN FROM books WHERE ISBN = '$isbn'";
+    error_log("Checking book existence with SQL: $checkBookSql");
     $bookExists = Database::GetData($checkBookSql, ['row' => 0]);
     if (!$bookExists) {
+        error_log("Book not found: $isbn");
         sendJsonResponse(false, 'Book not found');
     }
     
+    // Check if user has already rated this book
     $sql = "SELECT * FROM rating WHERE ISBN = '$isbn' AND Username = '$username'";
+    error_log("Checking existing rating with SQL: $sql");
     $existingRating = Database::GetData($sql, ['row' => 0]);
 
     try {
         if ($existingRating) {
+            // Update existing rating
             $sql = "UPDATE rating SET Point = $point, Comment = '$comment', UpdatedAt = CURRENT_TIMESTAMP(3) WHERE ISBN = '$isbn' AND Username = '$username'";
         } else {
+            // Insert new rating
             $sql = "INSERT INTO rating (ISBN, Username, Point, Comment) VALUES ('$isbn', '$username', $point, '$comment')";
         }
 
+        error_log("Executing SQL: $sql");
         if (!Database::NonQuery($sql)) {
+            error_log("Failed to save rating");
             throw new Exception("Failed to save rating");
         }
 
         // Get updated rating data
         $sql = "SELECT AVG(Point) as avg_point, COUNT(*) as total FROM rating WHERE ISBN = '$isbn'";
+        error_log("Getting rating stats with SQL: $sql");
         $ratingStats = Database::GetData($sql, ['row' => 0]);
         $avgPoint = $ratingStats && $ratingStats['avg_point'] ? round($ratingStats['avg_point'], 1) : 0;
         $totalRating = $ratingStats ? $ratingStats['total'] : 0;
 
         // Get user's rating
         $sql = "SELECT * FROM rating WHERE ISBN = '$isbn' AND Username = '$username'";
+        error_log("Getting user rating with SQL: $sql");
         $userRating = Database::GetData($sql, ['row' => 0]);
 
         // Get all ratings with pagination
@@ -109,10 +153,12 @@ try {
                 WHERE r.ISBN = '$isbn' 
                 ORDER BY r.UpdatedAt DESC
                 LIMIT $perPage OFFSET $offset";
+        error_log("Getting paginated ratings with SQL: $sql");
         $ratings = Database::GetData($sql);
 
         // Get total pages
         $sql = "SELECT COUNT(*) as total FROM rating WHERE ISBN = '$isbn'";
+        error_log("Getting total ratings count with SQL: $sql");
         $totalRatings = Database::GetData($sql, ['row' => 0])['total'];
         $totalPages = ceil($totalRatings / $perPage);
 
@@ -186,12 +232,13 @@ try {
         <?php
         $html = ob_get_clean();
         
+        error_log("Rating submitted successfully");
         sendJsonResponse(true, 'Rating submitted successfully', $html);
     } catch (Exception $e) {
-        error_log("Rating error: " . $e->getMessage());
+        error_log("Database error: " . $e->getMessage());
         sendJsonResponse(false, 'Error submitting rating: ' . $e->getMessage());
     }
 } catch (Exception $e) {
-    error_log("Rating error: " . $e->getMessage());
+    error_log("General error: " . $e->getMessage());
     sendJsonResponse(false, 'Error submitting rating: ' . $e->getMessage());
 } 
