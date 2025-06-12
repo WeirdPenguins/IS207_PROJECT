@@ -101,4 +101,4 @@ Rebook là một website thương mại điện tử chuyên cung cấp sách, c
 | 1   | 23521788   | Dương Phát Vĩnh    | [https://github.com/WeirdPenguins](https://github.com/WeirdPenguins) | 23521788@gm.uit.edu.vn    |
 | 2   | 23521705   | Trần Văn Tú        | [https://github.com/acommency](https://github.com/acommency)         | 23521705@gm.uit.edu.vn    |
 | 3   | 23521804   | Đỗ Văn Vũ          | [https://github.com/DW1804](https://github.com/DW1804)               | 23521804@gm.uit.edu.vn    |
-| 4   | 23521669   | Họ và Tên 4        | [https://github.com/thanhtruc011](https://github.com/thanhtruc011)   | 23521669@gm.uit.edu.vn    |
+| 4   | 23521669   | Nguyễn Hoàng Thanh Trúc        | [https://github.com/thanhtruc011](https://github.com/thanhtruc011)   | 23521669@gm.uit.edu.vn    |
